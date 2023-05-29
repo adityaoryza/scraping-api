@@ -2,37 +2,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cheerio = require("cheerio");
 const axios = require("axios");
-require("dotenv").config();
+const Data = require("../database/data");
 
 const app = express();
 const port = 7000;
 
 app.use(express.json());
-
-// mongoose configuration
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const dataSchema = new mongoose.Schema({
-  symbol: String,
-  e_rate: {
-    jual: Number,
-    beli: Number,
-  },
-  tt_counter: {
-    jual: Number,
-    beli: Number,
-  },
-  bank_notes: {
-    jual: Number,
-    beli: Number,
-  },
-  date: Date,
-});
-
-const Data = mongoose.model("Data", dataSchema);
 
 // note add new data if its needs
 // const newData = new Data({
@@ -123,7 +98,7 @@ app.get("/api/indexing", async (req, res) => {
     // Store the kurs data in the database
     await Data.insertMany(kursData);
 
-    res.json({ message: "Scraping and indexing completed" });
+    res.status(200).json({ message: "Scraping and indexing completed" });
   } catch (error) {
     console.error("Error during scraping:", error);
     res.status(500).json({ error: "Scraping and indexing failed" });
@@ -135,9 +110,17 @@ app.delete("/api/kurs/:date", async (req, res) => {
   const { date } = req.params;
 
   try {
+    const existingRecords = await Data.find({ date });
+
+    if (existingRecords.length === 0) {
+      // No records found for the specified date
+      res.status(404).json({ error: `No records found for date: ${date}` });
+      return;
+    }
+
     await Data.deleteMany({ date });
 
-    res.json({ message: `Deleted records for date: ${date}` });
+    res.status(200).json({ message: `Deleted records for date: ${date}` });
   } catch (error) {
     console.error("Error deleting records:", error);
     res.status(500).json({ error: "Failed to delete records" });
@@ -149,11 +132,17 @@ app.get("/api/kurs", async (req, res) => {
   const { startdate, enddate } = req.query;
 
   try {
-    const records = await Data.find({
-      date: { $gte: startdate, $lte: enddate },
-    });
+    const records = await Data.findRecordsByDate(startdate, enddate);
 
-    res.json(records);
+    if (records.length === 0) {
+      // No records found for the specified date range
+      res
+        .status(404)
+        .json({ error: "No records found for the specified date range" });
+      return;
+    }
+
+    res.status(200).json(records);
   } catch (error) {
     console.error("Error fetching records:", error);
     res.status(500).json({ error: "Failed to fetch records" });
@@ -161,7 +150,6 @@ app.get("/api/kurs", async (req, res) => {
 });
 
 // note this routes is completed
-// GET SPECIFIC SYMBOL IN SPECIFIC RANGES OF DATES
 app.get("/api/kurs/:symbol", async (req, res) => {
   const { symbol } = req.params;
   const { startdate, enddate } = req.query;
@@ -172,7 +160,15 @@ app.get("/api/kurs/:symbol", async (req, res) => {
       date: { $gte: startdate, $lte: enddate },
     });
 
-    res.json(records);
+    if (records.length === 0) {
+      // No records found for the specified symbol and date range
+      res.status(404).json({
+        error: "No records found for the specified symbol and date range",
+      });
+      return;
+    }
+
+    res.status(200).json(records);
   } catch (error) {
     console.error("Error fetching records:", error);
     res.status(500).json({ error: "Failed to fetch records" });
@@ -182,6 +178,21 @@ app.get("/api/kurs/:symbol", async (req, res) => {
 // note this routes completed
 app.post("/api/kurs", async (req, res) => {
   const kursData = req.body;
+
+  // Check if the required fields are present in the kursData
+  if (
+    !kursData.symbol ||
+    !kursData.date ||
+    !kursData.e_rate ||
+    !kursData.tt_counter ||
+    !kursData.bank_notes
+  ) {
+    res.status(400).json({
+      error:
+        "Incomplete data. Please provide symbol, date, value, e_rate, tt_counter, and bank_notes fields",
+    });
+    return;
+  }
 
   try {
     const existingRecord = await Data.findOne({
@@ -196,7 +207,9 @@ app.post("/api/kurs", async (req, res) => {
 
     await Data.create(kursData);
 
-    res.json({ message: "Data successfully inserted", data: kursData });
+    res
+      .status(200)
+      .json({ message: "Data successfully inserted", data: kursData });
   } catch (error) {
     console.error("Error inserting data:", error);
     res.status(500).json({ error: "Failed to insert data" });
@@ -224,7 +237,9 @@ app.put("/api/kurs", async (req, res) => {
       { new: true } // Returns the updated document instead of the original document
     );
 
-    res.json({ message: "Data successfully updated", data: updatedRecord });
+    res
+      .status(200)
+      .json({ message: "Data successfully updated", data: updatedRecord });
   } catch (error) {
     console.error("Error updating data:", error);
     res.status(500).json({ error: "Failed to update data" });
@@ -234,3 +249,5 @@ app.put("/api/kurs", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+module.exports = app;
