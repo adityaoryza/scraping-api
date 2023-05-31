@@ -53,9 +53,13 @@ To start the unit test, follow these steps:
    npm test
    ```
 
-The API will be available at `http://localhost:7000`.
+result :
+
+![Unit Test Result](./readme-img/npm-test.png)
 
 ## API Endpoints
+
+The API will be available at `http://localhost:7000`.
 
 ### Indexing Data
 
