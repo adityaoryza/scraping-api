@@ -55,7 +55,9 @@ To start the unit test, follow these steps:
 
 result :
 
-![Unit Test Result](./readme-img/npm-test.png)
+![npm test](./readme-img/npm-test.png)
+
+![result test](./readme-img/result.png)
 
 ## API Endpoints
 
