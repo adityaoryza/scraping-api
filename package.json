@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server/app.js",
-    "start": "node server/app.js"
+    "start": "node server/app.js",
+    "test": "npx mocha"
   },
   "keywords": [],
   "author": "",
@@ -16,16 +17,12 @@
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "faker": "^6.6.6",
-    "json2csv": "^6.0.0-alpha.2",
     "moment": "^2.29.4",
     "mongodb": "^5.5.0",
-    "mongoose": "^7.2.1",
-    "sinon": "^15.1.0"
+    "mongoose": "^7.2.1"
   },
   "devDependencies": {
     "chai": "^4.3.7",
-    "mocha": "^10.2.0",
-    "supertest": "^6.3.3"
+    "mocha": "^10.2.0"
   }
 }
