@@ -20,6 +20,8 @@ This documentation provides an overview of the Currency Exchange API and its end
 
 The Currency Exchange API provides access to currency exchange rate data sourced from the BCA website. It allows users to index and retrieve exchange rate information based on specific dates, symbols, and date ranges.
 
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/24306967-165e8aa4-8654-4777-a239-ff215e726635?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D24306967-165e8aa4-8654-4777-a239-ff215e726635%26entityType%3Dcollection%26workspaceId%3Dc9c80bd5-c9a2-4a28-87b9-1ceb6490df07)
+
 ## Installation
 
 To set up the Currency Exchange API on your local machine, follow these steps:
