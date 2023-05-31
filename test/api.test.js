@@ -9,7 +9,7 @@ const { expect } = chai;
 chai.use(chaiHttp);
 
 describe("API Endpoint Tests", () => {
-  //note  Test /api/indexing
+  //note  Unit test for => GET /api/indexing
   describe("GET /api/indexing", () => {
     it("should scrape and index data for the current date", function (done) {
       this.timeout(10000);
@@ -31,10 +31,11 @@ describe("API Endpoint Tests", () => {
         });
     });
   });
-  //   note delete
+
+  //note  Unit test for => DELETE /api/kurs/:date
   describe("DELETE /api/kurs/:date", () => {
     it("should delete records for the specified date", (done) => {
-      const date = "2023-05-31"; // Replace with a valid date from your dataset
+      const date = "2023-05-31"; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -47,7 +48,7 @@ describe("API Endpoint Tests", () => {
     });
 
     it("should return 404 if no records found for the specified date", (done) => {
-      const date = "2003-05-30"; // Replace with a date that has no records in your dataset
+      const date = "2003-05-30"; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -75,11 +76,12 @@ describe("API Endpoint Tests", () => {
         });
     });
   });
-  // note 3
+
+  //note  Unit test for => GET /api/kurs
   describe("GET /api/kurs", () => {
     it("should return records for the specified date range", (done) => {
-      const startdate = "2023-05-29"; // Replace with a valid start date from your dataset
-      const enddate = "2023-05-31"; // Replace with a valid end date from your dataset
+      const startdate = "2023-05-29"; //note Must be Replace with a valid date in database
+      const enddate = "2023-05-31"; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -88,14 +90,13 @@ describe("API Endpoint Tests", () => {
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("array");
-          // Add more specific assertions based on the response structure or data
           done();
         });
     });
 
     it("should return 404 if no records found for the specified date range", (done) => {
-      const startdate = "2023-06-01"; // Replace with a date range that has no records in your dataset
-      const enddate = "2023-06-30";
+      const startdate = "2023-06-01"; //note Must be Replace with a valid date in database
+      const enddate = "2023-06-30"; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -128,12 +129,13 @@ describe("API Endpoint Tests", () => {
         });
     });
   });
-  // note 4
+
+  //note  Unit test for => GET /api/kurs/:symbol
   describe("GET /api/kurs/:symbol", () => {
     it("should return records for the specified symbol and date range", (done) => {
-      const symbol = "USD"; // Replace with a valid symbol from your dataset
-      const startdate = "2023-05-29"; // Replace with a valid start date from your dataset
-      const enddate = "2023-05-31"; // Replace with a valid end date from your dataset
+      const symbol = "USD"; //note Must be replace with a valid symbol in dataset
+      const startdate = "2023-05-29"; //note Must be Replace with a valid date in database
+      const enddate = "2023-05-31"; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -147,9 +149,9 @@ describe("API Endpoint Tests", () => {
     });
 
     it("should return 404 if no records found for the specified symbol and date range", (done) => {
-      const symbol = "KKK";
-      const startdate = "2023-05-29";
-      const enddate = "2023-05-31";
+      const symbol = "KKK"; //note Must be replace with in-valid symbol in dataset
+      const startdate = "2023-05-29"; //note Must be Replace with a valid date in database
+      const enddate = "2023-05-31"; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -184,7 +186,8 @@ describe("API Endpoint Tests", () => {
         });
     });
   });
-  // note 4
+
+  //note  Unit test for => POST /api/kurs
   describe("POST /api/kurs", () => {
     it("should insert kurs data and return success message", (done) => {
       const kursData = {
@@ -258,7 +261,7 @@ describe("API Endpoint Tests", () => {
     it("should return an error if data already exists", (done) => {
       const kursData = {
         symbol: "USD",
-        date: "2023-05-30",
+        date: "2023-05-30", //note Must be Replace with a valid date in database that exists
         e_rate: 14100,
         tt_counter: 14050,
         bank_notes: 13950,
@@ -275,5 +278,98 @@ describe("API Endpoint Tests", () => {
         });
     });
   });
-  // note endpoint 6 unit test
+
+  //note  Unit test for => PUT /api/kurs
+  describe("PUT /api/kurs", () => {
+    it("should update an existing data record", (done) => {
+      const kursData = {
+        symbol: "USD",
+        e_rate: {
+          jual: 1803.55,
+          beli: 177355,
+        },
+        tt_counter: {
+          jual: 1803.55,
+          beli: 177355,
+        },
+        bank_notes: {
+          jual: 1803.55,
+          beli: 177355,
+        },
+        date: new Date("2023-05-29").toISOString(), //note should be date that exist in the database
+      };
+
+      chai
+        .request(app)
+        .put("/api/kurs")
+        .send(kursData)
+        .end((err, res) => {
+          if (err) {
+            console.error("Error updating data:", err);
+            done(err);
+          } else {
+            expect(res).to.have.status(200);
+            expect(res.body).to.have.property(
+              "message",
+              "Data successfully updated"
+            );
+            expect(res.body.data).to.include.all.keys("__v", "_id");
+            expect(res.body.data).to.deep.include({
+              symbol: kursData.symbol,
+              e_rate: kursData.e_rate,
+              tt_counter: kursData.tt_counter,
+              bank_notes: kursData.bank_notes,
+              date:
+                new Date(kursData.date).toISOString().split("T")[0] +
+                "T00:00:00.000Z",
+            });
+
+            done();
+          }
+        });
+    });
+
+    it("should return an error if data record not found", async () => {
+      const currentDate = new Date();
+      const randomOffset = Math.floor(Math.random() * (365 * 10)); // Generate a random number between 0 and 3650 (10 years)
+      const pastDate = new Date(
+        currentDate.getTime() - randomOffset * 24 * 60 * 60 * 1000
+      )
+        .toISOString()
+        .split("T")[0];
+      let existingRecord = await Data.findOne({ date: pastDate });
+
+      while (existingRecord) {
+        const randomOffset = Math.floor(Math.random() * (365 * 10));
+        const pastDate = new Date(
+          currentDate.getTime() - randomOffset * 24 * 60 * 60 * 1000
+        )
+          .toISOString()
+          .split("T")[0];
+        existingRecord = await Data.findOne({ date: pastDate });
+      }
+
+      const kursData = {
+        symbol: "BBB",
+        e_rate: {
+          jual: 1803.55,
+          beli: 177355,
+        },
+        tt_counter: {
+          jual: 1803.55,
+          beli: 177355,
+        },
+        bank_notes: {
+          jual: 1803.55,
+          beli: 177355,
+        },
+        date: pastDate,
+      };
+
+      const res = await chai.request(app).put("/api/kurs").send(kursData);
+
+      expect(res).to.have.status(404);
+      expect(res.body).to.have.property("error", "Data not found");
+    });
+  });
 });

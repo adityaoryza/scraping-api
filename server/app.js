@@ -36,12 +36,8 @@ app.use(express.json());
 // note : done
 app.get("/api/indexing", async (req, res) => {
   try {
-    const currentDate = new Date().toISOString().split("T")[0]; // Get the current date in "yyyy-mm-dd" format
-    // console.log("Current Date :", currentDate);
-
-    // Check if there is already data for the current date in the database
+    const currentDate = new Date().toISOString().split("T")[0];
     const existingData = await Data.findOne({ date: currentDate });
-    // console.log("Existing data : ", existingData);
 
     if (existingData) {
       // Data already exists for the current date, no need to scrape again
