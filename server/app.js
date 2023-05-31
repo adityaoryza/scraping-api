@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cheerio = require("cheerio");
+const moment = require("moment");
 const axios = require("axios");
 const Data = require("../database/data");
 
@@ -32,15 +33,15 @@ app.use(express.json());
 //   (err) => console.log(err)
 // );
 
-// note : this route is completed
+// note : done
 app.get("/api/indexing", async (req, res) => {
   try {
     const currentDate = new Date().toISOString().split("T")[0]; // Get the current date in "yyyy-mm-dd" format
-    console.log("Current Date :", currentDate);
+    // console.log("Current Date :", currentDate);
 
     // Check if there is already data for the current date in the database
     const existingData = await Data.findOne({ date: currentDate });
-    console.log("Existing data : ", existingData);
+    // console.log("Existing data : ", existingData);
 
     if (existingData) {
       // Data already exists for the current date, no need to scrape again
@@ -105,11 +106,17 @@ app.get("/api/indexing", async (req, res) => {
   }
 });
 
-// note this route is completed
+// note : done
 app.delete("/api/kurs/:date", async (req, res) => {
   const { date } = req.params;
 
   try {
+    if (!moment(date, "YYYY-MM-DD", true).isValid()) {
+      // Invalid date format
+      res.status(500).json({ error: "Invalid date format" });
+      return;
+    }
+
     const existingRecords = await Data.find({ date });
 
     if (existingRecords.length === 0) {
@@ -127,11 +134,20 @@ app.delete("/api/kurs/:date", async (req, res) => {
   }
 });
 
-// note this routes is completed
+// note : done
 app.get("/api/kurs", async (req, res) => {
   const { startdate, enddate } = req.query;
 
   try {
+    if (
+      !moment(startdate, "YYYY-MM-DD", true).isValid() ||
+      !moment(enddate, "YYYY-MM-DD", true).isValid()
+    ) {
+      // Invalid date format
+      res.status(500).json({ error: "Invalid date format" });
+      return;
+    }
+
     const records = await Data.findRecordsByDate(startdate, enddate);
 
     if (records.length === 0) {
@@ -149,10 +165,19 @@ app.get("/api/kurs", async (req, res) => {
   }
 });
 
-// note this routes is completed
+// note : done
 app.get("/api/kurs/:symbol", async (req, res) => {
   const { symbol } = req.params;
   const { startdate, enddate } = req.query;
+
+  // Validate the startdate and enddate using Moment.js
+  const isValidDate = (dateString) =>
+    moment(dateString, "YYYY-MM-DD", true).isValid();
+
+  if (!isValidDate(startdate) || !isValidDate(enddate)) {
+    res.status(500).json({ error: "Invalid startdate or enddate" });
+    return;
+  }
 
   try {
     const records = await Data.find({
@@ -175,7 +200,7 @@ app.get("/api/kurs/:symbol", async (req, res) => {
   }
 });
 
-// note this routes completed
+// note : done
 app.post("/api/kurs", async (req, res) => {
   const kursData = req.body;
 
