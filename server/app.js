@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const axios = require("axios");
 const cheerio = require("cheerio");
 const moment = require("moment");
-const axios = require("axios");
 const Data = require("../database/data");
 
 const app = express();
@@ -10,30 +10,6 @@ const port = 7000;
 
 app.use(express.json());
 
-// note add new data if its needs
-// const newData = new Data({
-//   symbol: "USD",
-//   e_rate: {
-//     jual: 1803.55,
-//     beli: 177355,
-//   },
-//   tt_counter: {
-//     jual: 1803.55,
-//     beli: 177355,
-//   },
-//   bank_notes: {
-//     jual: 1803.55,
-//     beli: 177355,
-//   },
-//   date: new Date("2003-05-22"),
-// });
-
-// newData.save().then(
-//   () => console.log("One entry added"),
-//   (err) => console.log(err)
-// );
-
-// note : done
 app.get("/api/indexing", async (req, res) => {
   try {
     const currentDate = new Date().toISOString().split("T")[0];
@@ -92,7 +68,6 @@ app.get("/api/indexing", async (req, res) => {
       kursData.push(kurs);
     });
 
-    // Store the kurs data in the database
     await Data.insertMany(kursData);
 
     res.status(200).json({ message: "Scraping and indexing completed" });
@@ -102,7 +77,6 @@ app.get("/api/indexing", async (req, res) => {
   }
 });
 
-// note : done
 app.delete("/api/kurs/:date", async (req, res) => {
   const { date } = req.params;
 
@@ -130,7 +104,6 @@ app.delete("/api/kurs/:date", async (req, res) => {
   }
 });
 
-// note : done
 app.get("/api/kurs", async (req, res) => {
   const { startdate, enddate } = req.query;
 
@@ -161,7 +134,6 @@ app.get("/api/kurs", async (req, res) => {
   }
 });
 
-// note : done
 app.get("/api/kurs/:symbol", async (req, res) => {
   const { symbol } = req.params;
   const { startdate, enddate } = req.query;
@@ -196,7 +168,6 @@ app.get("/api/kurs/:symbol", async (req, res) => {
   }
 });
 
-// note : done
 app.post("/api/kurs", async (req, res) => {
   const kursData = req.body;
 
@@ -237,7 +208,6 @@ app.post("/api/kurs", async (req, res) => {
   }
 });
 
-// note this routes is completed
 app.put("/api/kurs", async (req, res) => {
   const kursData = req.body;
 

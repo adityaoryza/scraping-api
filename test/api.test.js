@@ -1,6 +1,5 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const sinon = require("sinon"); // Import sinon library
 const app = require("../server/app");
 const Data = require("../database/data.js");
 
