@@ -1,115 +1,180 @@
-# Currency Exchange Rate API Documentation
+# Scraping API Documentation
 
-The Currency Exchange Rate API provides endpoints to fetch, store, update, and delete currency exchange rate data. The data is collected from https://www.bca.co.id/id/informasi/kurs, the official website of Bank Central Asia (BCA) in Indonesia.
+This documentation provides an overview of the Currency Exchange API and its endpoints. The API allows users to retrieve and manipulate currency exchange rate data.
 
-## API Base URL
+## Table of Contents
 
-    http://localhost:7000
+1. [Introduction](#introduction)
+2. [Installation](#installation)
+3. [Unit Test](#Unit-Test-using-mocha-js)
+4. [API Endpoints](#api-endpoints)
+   - [Indexing Data](#indexing-data)
+   - [Delete Data](#delete-data)
+   - [Get Data by Date Range](#get-data-by-date-range)
+   - [Get Data by Symbol and Date Range](#get-data-by-symbol-and-date-range)
+   - [Insert Data](#insert-data)
+   - [Update Data](#update-data)
+5. [Data Model](#data-model)
 
-## Endpoints
+## Introduction
 
-## Indexing and Scraping Currency Exchange Rate Data
+The Currency Exchange API provides access to currency exchange rate data sourced from the BCA website. It allows users to index and retrieve exchange rate information based on specific dates, symbols, and date ranges.
 
-This route performs scraping on https://www.bca.co.id/id/informasi/kurs to collect and store the latest currency exchange rate data in the database.
+## Installation
 
-URL: /api/indexing
+To set up the Currency Exchange API on your local machine, follow these steps:
 
-Method: GET
+1. Clone the repository:
 
-Response:
+   ```
+   git clone https://github.com/adityaoryza/scraping-api.git
+   ```
 
--200 OK: Scraping and indexing completed.
--500 Internal Server Error: Scraping and indexing failed.
+2. Install dependencies:
 
-## Delete Currency Exchange Rate Data by Date
+   ```
+   cd scraping-api
+   npm install
+   ```
 
-This route deletes currency exchange rate data from the database based on the specified date.
+3. Start the server:
 
-URL: /api/kurs/:date
+   ```
+   npm start
+   ```
 
-Method: DELETE
+## Unit Test using mocha js
 
-Parameters:
+To start the unit test, follow these steps:
 
-date (required): The date in "YYYY-mm-dd" format.
+1. Start the Unit Test (mochajs):
 
-Response:
+   ```
+   npm test
+   ```
 
--200 OK: Deleted records for the specified date.
--500 Internal Server Error: Failed to delete records.
+The API will be available at `http://localhost:7000`.
 
-## Get Currency Exchange Rate Data within a Date Range
+## API Endpoints
 
-This route retrieves currency exchange rate data from the database within the specified date range.
+### Indexing Data
 
-URL: /api/kurs?startdate=:startdate&enddate=:enddate
+**Endpoint:** `GET /api/indexing`
 
-Method: GET
+This endpoint scrapes the BCA website to fetch the latest currency exchange rate data and indexes it in the database.
 
-Query Parameters:
-
-startdate (required): The start date in "YYYY-mm-dd" format.
-
-enddate (required): The end date in "YYYY-mm-dd" format.
-
-Response:
-
--200 OK: Array of currency exchange rate records within the specified date range.
--500 Internal Server Error: Failed to fetch the records.
-
-## Get Currency Exchange Rate Data by Symbol and Date Range
-
-This route retrieves currency exchange rate data from the database for a specific symbol within the specified date range.
-
-URL: /api/kurs/:symbol?startdate=:startdate&enddate=:enddate
-
-Method: GET
-
-Parameters:
-
-symbol (required): The currency symbol (e.g., USD).
-
-Query Parameters:
-
-startdate (required): The start date in "YYYY-mm-dd" format.
-
-enddate (required): The end date in "YYYY-mm-dd" format.
+Request Parameters: None
 
 Response:
 
--200 OK: Array of currency exchange rate records for the specified symbol within the specified date range.
--500 Internal Server Error: Failed to fetch the records.
+- 200 OK: Indexing completed successfully
+- 500 Internal Server Error: An error occurred during scraping and indexing
 
-## Add Currency Exchange Rate Data
+### Delete Data
 
-This route adds new currency exchange rate data to the database. If the data already exists, it will be skipped.
+**Endpoint:** `DELETE /api/kurs/:date`
 
-URL: /api/kurs
+This endpoint deletes currency exchange rate data for a specific date.
 
-Method: POST
+Request Parameters:
+
+- `date` (string): The date in the format "YYYY-MM-DD" (e.g., "2023-05-31")
+
+Response:
+
+- 200 OK: Records for the specified date were deleted successfully
+- 404 Not Found: No records found for the specified date
+- 500 Internal Server Error: Failed to delete records
+
+### Get Data by Date Range
+
+**Endpoint:** `GET /api/kurs`
+
+This endpoint retrieves currency exchange rate data within a specified date range.
+
+Request Parameters:
+
+- `startdate` (string): The start date of the range in the format "YYYY-MM-DD"
+- `enddate` (string): The end date of the range in the format "YYYY-MM-DD"
+
+Response:
+
+- 200 OK: Array of records within the specified date range
+- 404 Not Found: No records found for the specified date range
+- 500 Internal Server Error: Failed to fetch records or invalid date format
+
+### Get Data by Symbol and Date Range
+
+**Endpoint:** `GET /api/kurs/:symbol`
+
+This endpoint retrieves currency exchange rate data for a specific symbol within a specified date range.
+
+Request Parameters:
+
+- `symbol` (string): The currency symbol (e.g., "USD", "EUR")
+- `startdate` (string): The start date of the range in the format "YYYY-MM-DD"
+- `enddate` (string): The end date of the range in the format "YYYY-MM-DD"
+
+Response:
+
+- 200 OK: Array of records for the specified symbol and date range
+- 404 Not Found: No records found for the specified symbol and date range
+- 500 Internal Server Error: Failed to fetch records or invalid date format
+
+### Insert Data
+
+\*\*
+
+Endpoint:\*\* `POST /api/kurs`
+
+This endpoint inserts new currency exchange rate data into the database.
 
 Request Body:
 
-Response:
-
--200 OK: Data successfully inserted.
--409 Conflict: Data already exists.
--500 Internal Server Error: Failed to insert data.
-
-## Update Currency Exchange Rate Data
-
-This route updates existing currency exchange rate data in the database. If the data does not exist, a 404 error is returned.
-
-URL: /api/kurs
-
-Method: PUT
-
-Request Body:
+- `symbol` (string): The currency symbol
+- `e_rate.jual` (number): Selling exchange rate
+- `e_rate.beli` (number): Buying exchange rate
+- `tt_counter.jual` (number): Selling exchange rate for traveler's checks
+- `tt_counter.beli` (number): Buying exchange rate for traveler's checks
+- `bank_notes.jual` (number): Selling exchange rate for bank notes
+- `bank_notes.beli` (number): Buying exchange rate for bank notes
+- `date` (string): The date of the exchange rate data in the format "YYYY-MM-DD"
 
 Response:
 
--200 OK: Data successfully updated.
--404 Not Found: Data not found.
--500 Internal Server Error: Failed to update data.
+- 201 Created: New record created successfully
+- 400 Bad Request: Invalid request body
+- 500 Internal Server Error: Failed to create new record
 
-Please note that the API is running on http://localhost:7000. Make sure to replace it with the appropriate base URL when making requests.
+### Update Data
+
+**Endpoint:** `PUT /api/kurs/:id`
+
+This endpoint updates existing currency exchange rate data.
+
+Request Parameters:
+
+- `id` (string): The ID of the record to update
+
+Request Body: Same as the request body for inserting data
+
+Response:
+
+- 200 OK: Record updated successfully
+- 400 Bad Request: Invalid request body or record not found
+- 500 Internal Server Error: Failed to update record
+
+## Data Model
+
+The data model for currency exchange rate records consists of the following fields:
+
+- `symbol` (string): The currency symbol
+- `e_rate.jual` (number): Selling exchange rate
+- `e_rate.beli` (number): Buying exchange rate
+- `tt_counter.jual` (number): Selling exchange rate for traveler's checks
+- `tt_counter.beli` (number): Buying exchange rate for traveler's checks
+- `bank_notes.jual` (number): Selling exchange rate for bank notes
+- `bank_notes.beli` (number): Buying exchange rate for bank notes
+- `date` (date): The date of the exchange rate data
+
+The `symbol` field represents the currency symbol, and the other fields represent different types of exchange rates. The `date` field stores the date for which the exchange rate data is applicable.
