@@ -46,7 +46,9 @@ To set up the Currency Exchange API on your local machine, follow these steps:
 
 ## Dependencies
 
-Import the json file in ScrapingApiDB to your own database
+- Import the json file in ScrapingApiDB to your own database
+- Here are the Postman Documentation :
+  https://www.postman.com/research-operator-43525001/workspace/api-works/collection/24306967-165e8aa4-8654-4777-a239-ff215e726635
 
 ## Unit Test using mocha js
 
