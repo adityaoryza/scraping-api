@@ -46,6 +46,7 @@ To set up the Currency Exchange API on your local machine, follow these steps:
 
 ## Dependencies
 
+- create .env file and write this MONGODB_URI=mongodb://url_db/db_name
 - Import the json file in ScrapingApiDB to your own database
 - Here are the Postman Documentation :
   https://www.postman.com/research-operator-43525001/workspace/api-works/collection/24306967-165e8aa4-8654-4777-a239-ff215e726635
