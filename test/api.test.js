@@ -16,7 +16,7 @@ describe("API Endpoint Tests", () => {
       chai
         .request(app)
         .get("/api/indexing")
-        .end((err, res) => {
+        .end(async (err, res) => {
           expect(res).to.have.status(200);
           expect(res.body)
             .to.have.property("message")
@@ -26,51 +26,14 @@ describe("API Endpoint Tests", () => {
                 message === "Data for the current date already exists"
               );
             });
-          done();
-        });
-    });
-  });
 
-  //note  Unit test for => DELETE /api/kurs/:date
-  describe("DELETE /api/kurs/:date", () => {
-    it("should delete records for the specified date", (done) => {
-      const date = "2023-05-31"; //note Must be Replace with a valid date in database
+          if (res.body.message === "Scraping and indexing completed") {
+            // Check if the data is pushed to the database
+            const currentDate = new Date().toISOString().split("T")[0];
+            const data = await Data.findOne({ date: currentDate });
+            expect(data).to.not.be.null;
+          }
 
-      chai
-        .request(app)
-        .delete(`/api/kurs/${date}`)
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.body).to.have.property("message").that.includes(date);
-          done();
-        });
-    });
-
-    it("should return 404 if no records found for the specified date", (done) => {
-      const date = "2003-05-30"; //note Must be Replace with a valid date in database
-
-      chai
-        .request(app)
-        .delete(`/api/kurs/${date}`)
-        .end((err, res) => {
-          expect(res).to.have.status(404);
-          expect(res.body).to.have.property("error").that.includes(date);
-          done();
-        });
-    });
-
-    it("should return 500 if an error occurs during deletion and invalid-date", (done) => {
-      // Simulating an error by passing an invalid date format
-      const date = "invalid-date";
-
-      chai
-        .request(app)
-        .delete(`/api/kurs/${date}`)
-        .end((err, res) => {
-          expect(res).to.have.status(500);
-          expect(res.body)
-            .to.have.property("error")
-            .that.equals("Invalid date format");
           done();
         });
     });
@@ -79,8 +42,8 @@ describe("API Endpoint Tests", () => {
   //note  Unit test for => GET /api/kurs
   describe("GET /api/kurs", () => {
     it("should return records for the specified date range", (done) => {
-      const startdate = "2023-05-29"; //note Must be Replace with a valid date in database
-      const enddate = "2023-05-31"; //note Must be Replace with a valid date in database
+      const startdate = new Date().toISOString().split("T")[0]; //note Must be Replace with a valid date in database
+      const enddate = new Date().toISOString().split("T")[0]; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -94,8 +57,8 @@ describe("API Endpoint Tests", () => {
     });
 
     it("should return 404 if no records found for the specified date range", (done) => {
-      const startdate = "2023-06-01"; //note Must be Replace with a valid date in database
-      const enddate = "2023-06-30"; //note Must be Replace with a valid date in database
+      const startdate = "2002-06-01"; //note Must be Replace with a valid date in database
+      const enddate = "2002-06-30"; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -113,7 +76,7 @@ describe("API Endpoint Tests", () => {
     it("should return 500 if an error occurs during invalid-date format", (done) => {
       // Simulating an error by passing an invalid date range
       const startdate = "invalid-date";
-      const enddate = "2023-05-31";
+      const enddate = new Date().toISOString().split("T")[0];
 
       chai
         .request(app)
@@ -133,8 +96,8 @@ describe("API Endpoint Tests", () => {
   describe("GET /api/kurs/:symbol", () => {
     it("should return records for the specified symbol and date range", (done) => {
       const symbol = "USD"; //note Must be replace with a valid symbol in dataset
-      const startdate = "2023-05-29"; //note Must be Replace with a valid date in database
-      const enddate = "2023-05-31"; //note Must be Replace with a valid date in database
+      const startdate = new Date().toISOString().split("T")[0]; //note Must be Replace with a valid date in database
+      const enddate = new Date().toISOString().split("T")[0]; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -149,8 +112,8 @@ describe("API Endpoint Tests", () => {
 
     it("should return 404 if no records found for the specified symbol and date range", (done) => {
       const symbol = "KKK"; //note Must be replace with in-valid symbol in dataset
-      const startdate = "2023-05-29"; //note Must be Replace with a valid date in database
-      const enddate = "2023-05-31"; //note Must be Replace with a valid date in database
+      const startdate = "2003-05-29"; //note Must be Replace with a valid date in database
+      const enddate = "2003-05-31"; //note Must be Replace with a valid date in database
 
       chai
         .request(app)
@@ -260,7 +223,7 @@ describe("API Endpoint Tests", () => {
     it("should return an error if data already exists", (done) => {
       const kursData = {
         symbol: "USD",
-        date: "2023-05-30", //note Must be Replace with a valid date in database that exists
+        date: new Date().toISOString().split("T")[0], //note Must be Replace with a valid date in database that exists
         e_rate: 14100,
         tt_counter: 14050,
         bank_notes: 13950,
@@ -295,7 +258,7 @@ describe("API Endpoint Tests", () => {
           jual: 1803.55,
           beli: 177355,
         },
-        date: new Date("2023-05-29").toISOString(), //note should be date that exist in the database
+        date: new Date().toISOString().split("T")[0], //note should be date that exist in the database
       };
 
       chai
@@ -369,6 +332,51 @@ describe("API Endpoint Tests", () => {
 
       expect(res).to.have.status(404);
       expect(res.body).to.have.property("error", "Data not found");
+    });
+  });
+
+  //note  Unit test for => DELETE /api/kurs/:date
+  describe("DELETE /api/kurs/:date", () => {
+    it("should delete records for the specified date", (done) => {
+      const date = new Date().toISOString().split("T")[0]; // Replace with a valid date in the database
+
+      chai
+        .request(app)
+        .delete(`/api/kurs/${date}`)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.property("message").that.includes(date);
+          done(); // Call done() to indicate the completion of the test
+        });
+    });
+
+    it("should return 404 if no records found for the specified date", (done) => {
+      const date = "2003-05-30"; //note Must be Replace with a valid date in database
+
+      chai
+        .request(app)
+        .delete(`/api/kurs/${date}`)
+        .end((err, res) => {
+          expect(res).to.have.status(404);
+          expect(res.body).to.have.property("error").that.includes(date);
+          done();
+        });
+    });
+
+    it("should return 500 if an error occurs during deletion and invalid-date", (done) => {
+      // Simulating an error by passing an invalid date format
+      const date = "invalid-date";
+
+      chai
+        .request(app)
+        .delete(`/api/kurs/${date}`)
+        .end((err, res) => {
+          expect(res).to.have.status(500);
+          expect(res.body)
+            .to.have.property("error")
+            .that.equals("Invalid date format");
+          done();
+        });
     });
   });
 });
