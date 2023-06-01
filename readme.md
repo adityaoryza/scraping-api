@@ -6,15 +6,16 @@ This documentation provides an overview of the Currency Exchange API and its end
 
 1. [Introduction](#introduction)
 2. [Installation](#installation)
-3. [Unit Test](#Unit-Test-using-mocha-js)
-4. [API Endpoints](#api-endpoints)
+3. [Dependencies](#dependencies)
+4. [Unit Test](#Unit-Test-using-mocha-js)
+5. [API Endpoints](#api-endpoints)
    - [Indexing Data](#indexing-data)
    - [Delete Data](#delete-data)
    - [Get Data by Date Range](#get-data-by-date-range)
    - [Get Data by Symbol and Date Range](#get-data-by-symbol-and-date-range)
    - [Insert Data](#insert-data)
    - [Update Data](#update-data)
-5. [Data Model](#data-model)
+6. [Data Model](#data-model)
 
 ## Introduction
 
@@ -42,6 +43,10 @@ To set up the Currency Exchange API on your local machine, follow these steps:
    ```
    npm start
    ```
+
+## Dependencies
+
+Import the json file in ScrapingApiDB to your own database
 
 ## Unit Test using mocha js
 
