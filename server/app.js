@@ -1,52 +1,52 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const axios = require("axios");
-const cheerio = require("cheerio");
-const moment = require("moment");
-const Data = require("../database/data");
+const express = require('express');
+const mongoose = require('mongoose');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const moment = require('moment');
+const Data = require('../database/data');
 
 const app = express();
 const port = 7000;
 
 app.use(express.json());
 
-app.get("/api/indexing", async (req, res) => {
+app.get('/api/indexing', async (req, res) => {
   try {
-    const currentDate = new Date().toISOString().split("T")[0];
+    const currentDate = new Date().toISOString().split('T')[0];
     const existingData = await Data.findOne({ date: currentDate });
 
     if (existingData) {
       // Data already exists for the current date, no need to scrape again
-      res.json({ message: "Data for the current date already exists" });
+      res.json({ message: 'Data for the current date already exists' });
       return;
     }
 
-    const url = "https://www.bca.co.id/id/informasi/kurs";
+    const url = 'https://www.bca.co.id/id/informasi/kurs';
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
-    const kursTable = $(".m-table-kurs");
+    const kursTable = $('.m-table-kurs');
     const kursData = [];
 
-    $("tbody tr", kursTable).each((index, row) => {
-      const columns = $(row).find("td");
+    $('tbody tr', kursTable).each((index, row) => {
+      const columns = $(row).find('td');
       const symbol = $(columns[0]).text().trim();
       const eRateBeli = parseFloat(
-        $(columns[1]).text().trim().replace(/\./g, "").replace(",", ".")
+        $(columns[1]).text().trim().replace(/\./g, '').replace(',', '.')
       );
       const eRateJual = parseFloat(
-        $(columns[2]).text().trim().replace(/\./g, "").replace(",", ".")
+        $(columns[2]).text().trim().replace(/\./g, '').replace(',', '.')
       );
       const ttCounterBeli = parseFloat(
-        $(columns[3]).text().trim().replace(/\./g, "").replace(",", ".")
+        $(columns[3]).text().trim().replace(/\./g, '').replace(',', '.')
       );
       const ttCounterJual = parseFloat(
-        $(columns[4]).text().trim().replace(/\./g, "").replace(",", ".")
+        $(columns[4]).text().trim().replace(/\./g, '').replace(',', '.')
       );
       const bankNotesBeli = parseFloat(
-        $(columns[5]).text().trim().replace(/\./g, "").replace(",", ".")
+        $(columns[5]).text().trim().replace(/\./g, '').replace(',', '.')
       );
       const bankNotesJual = parseFloat(
-        $(columns[6]).text().trim().replace(/\./g, "").replace(",", ".")
+        $(columns[6]).text().trim().replace(/\./g, '').replace(',', '.')
       );
 
       const kurs = {
@@ -70,20 +70,20 @@ app.get("/api/indexing", async (req, res) => {
 
     await Data.insertMany(kursData);
 
-    res.status(200).json({ message: "Scraping and indexing completed" });
+    res.status(200).json({ message: 'Scraping and indexing completed' });
   } catch (error) {
-    console.error("Error during scraping:", error);
-    res.status(500).json({ error: "Scraping and indexing failed" });
+    console.error('Error during scraping:', error);
+    res.status(500).json({ error: 'Scraping and indexing failed' });
   }
 });
 
-app.delete("/api/kurs/:date", async (req, res) => {
+app.delete('/api/kurs/:date', async (req, res) => {
   const { date } = req.params;
 
   try {
-    if (!moment(date, "YYYY-MM-DD", true).isValid()) {
+    if (!moment(date, 'YYYY-MM-DD', true).isValid()) {
       // Invalid date format
-      res.status(500).json({ error: "Invalid date format" });
+      res.status(500).json({ error: 'Invalid date format' });
       return;
     }
 
@@ -99,21 +99,21 @@ app.delete("/api/kurs/:date", async (req, res) => {
 
     res.status(200).json({ message: `Deleted records for date: ${date}` });
   } catch (error) {
-    console.error("Error deleting records:", error);
-    res.status(500).json({ error: "Failed to delete records" });
+    console.error('Error deleting records:', error);
+    res.status(500).json({ error: 'Failed to delete records' });
   }
 });
 
-app.get("/api/kurs", async (req, res) => {
+app.get('/api/kurs', async (req, res) => {
   const { startdate, enddate } = req.query;
 
   try {
     if (
-      !moment(startdate, "YYYY-MM-DD", true).isValid() ||
-      !moment(enddate, "YYYY-MM-DD", true).isValid()
+      !moment(startdate, 'YYYY-MM-DD', true).isValid() ||
+      !moment(enddate, 'YYYY-MM-DD', true).isValid()
     ) {
       // Invalid date format
-      res.status(500).json({ error: "Invalid date format" });
+      res.status(500).json({ error: 'Invalid date format' });
       return;
     }
 
@@ -123,27 +123,27 @@ app.get("/api/kurs", async (req, res) => {
       // No records found for the specified date range
       res
         .status(404)
-        .json({ error: "No records found for the specified date range" });
+        .json({ error: 'No records found for the specified date range' });
       return;
     }
 
     res.status(200).json(records);
   } catch (error) {
-    console.error("Error fetching records:", error);
-    res.status(500).json({ error: "Failed to fetch records" });
+    console.error('Error fetching records:', error);
+    res.status(500).json({ error: 'Failed to fetch records' });
   }
 });
 
-app.get("/api/kurs/:symbol", async (req, res) => {
+app.get('/api/kurs/:symbol', async (req, res) => {
   const { symbol } = req.params;
   const { startdate, enddate } = req.query;
 
   // Validate the startdate and enddate using Moment.js
   const isValidDate = (dateString) =>
-    moment(dateString, "YYYY-MM-DD", true).isValid();
+    moment(dateString, 'YYYY-MM-DD', true).isValid();
 
   if (!isValidDate(startdate) || !isValidDate(enddate)) {
-    res.status(500).json({ error: "Invalid startdate or enddate" });
+    res.status(500).json({ error: 'Invalid startdate or enddate' });
     return;
   }
 
@@ -156,19 +156,19 @@ app.get("/api/kurs/:symbol", async (req, res) => {
     if (records.length === 0) {
       // No records found for the specified symbol and date range
       res.status(404).json({
-        error: "No records found for the specified symbol and date range",
+        error: 'No records found for the specified symbol and date range',
       });
       return;
     }
 
     res.status(200).json(records);
   } catch (error) {
-    console.error("Error fetching records:", error);
-    res.status(500).json({ error: "Failed to fetch records" });
+    console.error('Error fetching records:', error);
+    res.status(500).json({ error: 'Failed to fetch records' });
   }
 });
 
-app.post("/api/kurs", async (req, res) => {
+app.post('/api/kurs', async (req, res) => {
   const kursData = req.body;
 
   // Check if the required fields are present in the kursData
@@ -181,7 +181,7 @@ app.post("/api/kurs", async (req, res) => {
   ) {
     res.status(400).json({
       error:
-        "Incomplete data. Please provide symbol, date, value, e_rate, tt_counter, and bank_notes fields",
+        'Incomplete data. Please provide symbol, date, value, e_rate, tt_counter, and bank_notes fields',
     });
     return;
   }
@@ -193,7 +193,7 @@ app.post("/api/kurs", async (req, res) => {
     });
 
     if (existingRecord) {
-      res.status(409).json({ error: "Data already exists" });
+      res.status(409).json({ error: 'Data already exists' });
       return;
     }
 
@@ -201,14 +201,14 @@ app.post("/api/kurs", async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Data successfully inserted", data: kursData });
+      .json({ message: 'Data successfully inserted', data: kursData });
   } catch (error) {
-    console.error("Error inserting data:", error);
-    res.status(500).json({ error: "Failed to insert data" });
+    console.error('Error inserting data:', error);
+    res.status(500).json({ error: 'Failed to insert data' });
   }
 });
 
-app.put("/api/kurs", async (req, res) => {
+app.put('/api/kurs', async (req, res) => {
   const kursData = req.body;
 
   try {
@@ -218,7 +218,7 @@ app.put("/api/kurs", async (req, res) => {
     });
 
     if (!existingRecord) {
-      res.status(404).json({ error: "Data not found" });
+      res.status(404).json({ error: 'Data not found' });
       return;
     }
 
@@ -230,10 +230,10 @@ app.put("/api/kurs", async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Data successfully updated", data: updatedRecord });
+      .json({ message: 'Data successfully updated', data: updatedRecord });
   } catch (error) {
-    console.error("Error updating data:", error);
-    res.status(500).json({ error: "Failed to update data" });
+    console.error('Error updating data:', error);
+    res.status(500).json({ error: 'Failed to update data' });
   }
 });
 
