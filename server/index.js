@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const moment = require('moment');
-const Data = require('../models/data');
+const Data = require('./models/data');
 
 const app = express();
 const port = 7000;
