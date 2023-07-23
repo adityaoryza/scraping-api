@@ -2,14 +2,10 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 //mongodb URI
-// mongoose.connect(process.env.MONGODB_URI, {
-mongoose.connect(
-  'mongodb://127.0.0.1:27017/ScrapingApiDB?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.9.1',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const db = mongoose.connection;
 
