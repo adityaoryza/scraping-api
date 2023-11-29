@@ -17,6 +17,9 @@ This documentation provides an overview of the Currency Exchange API and its end
    - [Update Data](#update-data)
 6. [Data Model](#data-model)
 
+##Postman Documentation
+   https://documenter.getpostman.com/view/24306967/2s9YeHYpkY
+
 ## Introduction
 
 The Currency Exchange API provides access to currency exchange rate data sourced from the BCA website. It allows users to index and retrieve exchange rate information based on specific dates, symbols, and date ranges.
