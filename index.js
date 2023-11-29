@@ -9,7 +9,9 @@ const app = express();
 const port = 7000;
 
 app.use(express.json());
-
+app.get('/', (req, res) => {
+  res.send('Welcome to the scraping API!');
+});
 app.get('/api/indexing', async (req, res) => {
   try {
     const currentDate = new Date().toISOString().split('T')[0];
