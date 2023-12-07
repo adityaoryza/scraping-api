@@ -1,26 +1,9 @@
 # Scraping API Documentation
 
-This documentation provides an overview of the Currency Exchange API and its endpoints. The API allows users to retrieve and manipulate currency exchange rate data.
-
-## Table of Contents
-
-1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Dependencies](#dependencies)
-4. [Unit Test](#Unit-Test-using-mocha-js)
-5. [API Endpoints](#api-endpoints)
-   - [Indexing Data](#indexing-data)
-   - [Delete Data](#delete-data)
-   - [Get Data by Date Range](#get-data-by-date-range)
-   - [Get Data by Symbol and Date Range](#get-data-by-symbol-and-date-range)
-   - [Insert Data](#insert-data)
-   - [Update Data](#update-data)
-6. [Data Model](#data-model)
-
 ## Postman Documentation
-   ```
-   https://documenter.getpostman.com/view/24306967/2s9YeHYpkY
-   ```
+
+![Postman Documentation](https://documenter.getpostman.com/view/24306967/2s9YeHYpkY)
+
 ## Introduction
 
 The Currency Exchange API provides access to currency exchange rate data sourced from the BCA website. It allows users to index and retrieve exchange rate information based on specific dates, symbols, and date ranges.
@@ -47,13 +30,6 @@ To set up the Currency Exchange API on your local machine, follow these steps:
    ```
    npm start
    ```
-
-## Dependencies
-
-- create .env file and write this MONGODB_URI=mongodb://url_db/db_name
-- Import the json file in ScrapingApiDB to your own database
-- Here are the Postman Documentation :
-  https://www.postman.com/research-operator-43525001/workspace/api-works/collection/24306967-165e8aa4-8654-4777-a239-ff215e726635
 
 ## Unit Test using mocha js
 
